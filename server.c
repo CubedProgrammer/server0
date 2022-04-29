@@ -15,7 +15,7 @@ struct accept_routine_data
     struct sockaddr *sap;
     int sfd;
 };
-char msg200[] = "HTTP/1.1 200 OK\r\ncontent-type: text, text/html\r\nconnection: close\r\n\r\n";
+char msg200[] = "HTTP/1.1 200 OK\r\ncontent-type: text/html\r\nconnection: close\r\n\r\n";
 char msg400[] = "HTTP/1.1 400 Bad Request\r\ncontent-type: text\r\n\r\n400 Bad Request\r\n";
 char msg404[] = "HTTP/1.1 404 Not Found\r\ncontent-type: text\r\n\r\n404 Not Found\r\n";
 int start_server(struct sockaddr_in *saddrp, int port);
@@ -39,9 +39,11 @@ void fetch_file(int cli, const char *path)
         strcpy(fname, "pages");
         strcpy(fname + 5, path);
     }*/
-    write(cli, msg200, sizeof msg200);
+    size_t bc = write(cli, msg200, sizeof msg200);
+    if(bc != sizeof msg200)
+        infolog("Less than what should have been written was written in 200 response.");
     char cbuf[2048];
-    size_t bc = 2048;
+    bc = 2048;
     FILE *fh = fopen("pages/index.html", "r");
     while(bc == sizeof(cbuf))
     {
@@ -56,9 +58,11 @@ int handle_client(int cli)
     char cbuf[10001];
     size_t bc = read(cli, cbuf, 10000);
     cbuf[bc] = '\0';
+    infolog("Request was made.");
+    infolog(cbuf);
     char reqmeth[13];
     char *space = strchr(cbuf, ' ');
-    unsigned ind = space - cbuf;
+    unsigned ind = space == NULL ? 13 : space - cbuf;
     int succ = 0;
     if(ind > 12)
     {
