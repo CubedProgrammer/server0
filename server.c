@@ -112,15 +112,18 @@ int main(int argl, char *argv[])
         getchar();
         succ = finish_logging();
     }
+    close(ard.sfd);
     return succ;
 }
 void *accept_routine(void *arg)
 {
     struct accept_routine_data *datp = arg;
     struct sockaddr *sap = datp->sap;
+    struct sockaddr_in *saip = sap;
     int sfd = datp->sfd;
     socklen_t *slen = datp->slenp;
     int cfd;
+    char msg[1001];
     for(;;)
     {
         cfd = accept(sfd, sap, slen);
@@ -129,7 +132,11 @@ void *accept_routine(void *arg)
             infolog("Accepting a client has failed");
         }
         else
+        {
+		    snprintf(msg, sizeof(msg), "Accepted client %s with socket %i.\n", inet_ntoa(saip->sin_addr), cfd);
+		    infolog(msg);
             handle_client(cfd);
+        }
     }
     return NULL;
 }
