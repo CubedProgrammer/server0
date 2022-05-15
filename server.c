@@ -22,11 +22,13 @@ int start_server(struct sockaddr_in *saddrp, int port);
 void *accept_routine(void *arg);
 void bad_request(int cli)
 {
+    infolog("Previous request was invalid");
     write(cli, msg400, sizeof(msg400));
     close(cli);
 }
 void not_found(int cli)
 {
+    infolog("Previous request requested for a non-existant resource");
     write(cli, msg404, sizeof(msg404));
     close(cli);
 }
