@@ -77,9 +77,17 @@ int handle_client(int cli)
         {
             char *path = space + 1;
             space = strchr(path, ' ');
-            ind = space - path;
-            path[ind] = '\0';
-            fetch_file(cli, path);
+            if(space == NULL)
+            {
+                bad_request(cli);
+                succ = -1;
+            }
+            else
+            {
+                ind = space - path;
+                path[ind] = '\0';
+                fetch_file(cli, path);
+            }
         }
         else
         {
@@ -119,7 +127,7 @@ void *accept_routine(void *arg)
 {
     struct accept_routine_data *datp = arg;
     struct sockaddr *sap = datp->sap;
-    struct sockaddr_in *saip = sap;
+    struct sockaddr_in *saip = (struct sockaddr_in *)sap;
     int sfd = datp->sfd;
     socklen_t *slen = datp->slenp;
     int cfd;
