@@ -1,5 +1,6 @@
 #include<arpa/inet.h>
 #include<pthread.h>
+#include<signal.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -55,6 +56,10 @@ void fetch_file(int cli, const char *path)
     fclose(fh);
     close(cli);
 }
+void sigpipe_handler(int x)
+{
+    infolog("SIGPIPE was sent.");
+}
 int handle_client(int cli)
 {
     char cbuf[10001];
@@ -102,6 +107,7 @@ int handle_client(int cli)
 int main(int argl, char *argv[])
 {
     puts("site_one");
+    signal(SIGPIPE, sigpipe_handler);
     const char *logfile = "logs.txt";
     if(argv[1])
         logfile = argv[1];
