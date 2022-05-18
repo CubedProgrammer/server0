@@ -6,6 +6,7 @@
 #include<string.h>
 #include<sys/socket.h>
 #include<unistd.h>
+#include"fetch.h"
 #include"logging.h"
 #ifndef POET
 #define PORT 8080
@@ -35,14 +36,25 @@ void not_found(int cli)
 }
 void fetch_file(int cli, const char *path)
 {
-    /*size_t pathlen = strlen(path);
+    size_t pathlen = strlen(path);
     if(pathlen > 5 && pathlen < 2595)
     {
         char fname[2601];
         strcpy(fname, "pages");
         strcpy(fname + 5, path);
-    }*/
-    size_t bc = write(cli, msg200, sizeof msg200);
+        size_t bc = write(cli, msg200, sizeof msg200);
+        if(bc != sizeof msg200)
+            infolog("Less than what should have been written was written in 200 response.");
+        int succ = fetch_resource(fname, cli);
+        if(succ != 0)
+        {
+            infolog("Fetching resource failed");
+            //not_found(cli);
+        }
+        else
+            close(cli);
+    }
+    /*size_t bc = write(cli, msg200, sizeof msg200);
     if(bc != sizeof msg200)
         infolog("Less than what should have been written was written in 200 response.");
     char cbuf[2048];
@@ -53,8 +65,7 @@ void fetch_file(int cli, const char *path)
         bc = fread(cbuf, 1, sizeof(cbuf), fh);
         write(cli, cbuf, bc);
     }
-    fclose(fh);
-    close(cli);
+    fclose(fh);*/
 }
 void sigpipe_handler(int x)
 {
