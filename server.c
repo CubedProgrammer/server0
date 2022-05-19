@@ -8,8 +8,12 @@
 #include<unistd.h>
 #include"fetch.h"
 #include"logging.h"
-#ifndef POET
+#include"mimetype.h"
+#ifndef PORT
 #define PORT 8080
+#endif
+#ifndef MIMETYPES
+#define MIMETYPES "content-type.txt"
 #endif
 struct accept_routine_data
 {
@@ -17,7 +21,6 @@ struct accept_routine_data
     struct sockaddr *sap;
     int sfd;
 };
-char msg200[] = "HTTP/1.1 200 OK\r\ncontent-type: text/html\r\nconnection: close\r\n\r\n";
 char msg400[] = "HTTP/1.1 400 Bad Request\r\ncontent-type: text\r\n\r\n400 Bad Request\r\n";
 char msg404[] = "HTTP/1.1 404 Not Found\r\ncontent-type: text\r\n\r\n404 Not Found\r\n";
 int start_server(struct sockaddr_in *saddrp, int port);
@@ -42,14 +45,14 @@ void fetch_file(int cli, const char *path)
         char fname[2601];
         strcpy(fname, "pages");
         strcpy(fname + 5, path);
-        size_t bc = write(cli, msg200, sizeof msg200);
+        /*size_t bc = write(cli, msg200, sizeof msg200);
         if(bc != sizeof msg200)
-            infolog("Less than what should have been written was written in 200 response.");
+            infolog("Less than what should have been written was written in 200 response.");*/
         int succ = fetch_resource(fname, cli);
         if(succ != 0)
         {
             infolog("Fetching resource failed");
-            //not_found(cli);
+            close(cli);
         }
         else
             close(cli);
@@ -123,7 +126,11 @@ int main(int argl, char *argv[])
     if(argv[1])
         logfile = argv[1];
     init_logger(logfile);
-    int succ = 0;
+    puts("initialized logger");
+    int succ = load_mimetypes(MIMETYPES);
+    puts("loaded mimetypes");
+    if(succ != 0)
+        infolog("Could not load mimetypes file.");
     struct sockaddr_in saddr;
     struct accept_routine_data ard;
     socklen_t slen = sizeof saddr;
@@ -137,6 +144,7 @@ int main(int argl, char *argv[])
         pthread_t pth;
         pthread_create(&pth, NULL, accept_routine, &ard);
         getchar();
+        free_mimetypes();
         succ = finish_logging();
     }
     close(ard.sfd);

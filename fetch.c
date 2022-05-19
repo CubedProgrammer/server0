@@ -6,6 +6,11 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include"fetch.h"
+#include"mimetype.h"
+
+char msg200[] = "HTTP/1.1 200 OK\r\nconnection: close\r\ncontent-type: ";
+char endlns[] = "\r\n\r\n";
+
 int fetch_resource(char *path, int cli)
 {
     int succ = 0;
@@ -27,6 +32,12 @@ int fetch_resource(char *path, int cli)
             else
             {
                 char cbuf[16384];
+                const char *ext = strrchr(path, '.');
+                write(cli, msg200, sizeof(msg200) - 1);
+                const char *ct = ext == NULL ? "text" : mimetype(ext + 1);
+                size_t ctlen = strlen(ct);
+                write(cli, ct, ctlen);
+                write(cli, endlns, sizeof endlns);
                 size_t bc = fread(cbuf, 1, sizeof(cbuf), fh);
                 write(cli, cbuf, bc);
                 while(bc == sizeof(cbuf))
