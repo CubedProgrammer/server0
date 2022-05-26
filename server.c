@@ -40,11 +40,12 @@ void not_found(int cli)
 void fetch_file(int cli, const char *path)
 {
     size_t pathlen = strlen(path);
-    if(pathlen > 5 && pathlen < 2595)
+    if(pathlen > 0 && pathlen < 2595)
     {
         char fname[2601];
         strcpy(fname, "pages");
         strcpy(fname + 5, path);
+        infolog(path);
         /*size_t bc = write(cli, msg200, sizeof msg200);
         if(bc != sizeof msg200)
             infolog("Less than what should have been written was written in 200 response.");*/

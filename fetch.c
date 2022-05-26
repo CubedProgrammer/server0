@@ -6,6 +6,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include"fetch.h"
+#include"logging.h"
 #include"mimetype.h"
 
 char msg200[] = "HTTP/1.1 200 OK\r\nconnection: close\r\ncontent-type: ";
@@ -14,28 +15,48 @@ char endlns[] = "\r\n\r\n";
 int fetch_resource(char *path, int cli)
 {
     int succ = 0;
+    char cbuf[16384];
+    FILE *fh;
     if(access(path, F_OK) == 0)
     {
+        char ff = 0;
         struct stat fdat;
         stat(path, &fdat);
         if(S_ISDIR(fdat.st_mode))
         {
-            succ = -1;
+            char *indexp = cbuf;
+            strcpy(indexp, path);
+            size_t plen = strlen(indexp);
+            if(plen > 2589)
+                succ = -1;
+            else
+            {
+                strcpy(indexp + plen, "/index.html");
+                path = indexp;
+                infolog("Attempted to fetch directory, fetching this index.html file");
+                ff = 1;
+            }
         }
         else if(access(path, X_OK) == 0)
             succ = fetch_executable(path, "", cli);
         else
+            ff = 1;
+        if(ff)
         {
-            FILE *fh = fopen(path, "r");
+            infolog("Fetching file");
+            openf:
+            infolog(path);
+            fh = fopen(path, "r");
             if(fh == NULL)
                 succ = -1;
             else
             {
-                char cbuf[16384];
                 const char *ext = strrchr(path, '.');
+                puts(ext);
                 write(cli, msg200, sizeof(msg200) - 1);
-                const char *ct = ext == NULL ? "text" : mimetype(ext + 1);
+                const char *ct = ext == NULL ? "text/plain" : mimetype(ext + 1);
                 size_t ctlen = strlen(ct);
+                puts(ct);
                 write(cli, ct, ctlen);
                 write(cli, endlns, sizeof endlns);
                 size_t bc = fread(cbuf, 1, sizeof(cbuf), fh);
@@ -71,11 +92,15 @@ int fetch_executable(const char *path, const char *param, int cli)
         if(pid == 0)
         {
             int rt = po[1];
-            dup2(STDOUT_FILENO, rt);
+            dup2(rt, STDOUT_FILENO);
             char execpath[2600];
             strcpy(execpath, "./");
             strcpy(execpath + 2, path);
+            infolog("Fetching executable");
+            infolog(execpath);
+            infolog(param);
             int fail = execl(execpath, execpath, param, (char *)NULL);
+            infolog("Could not execute executable");
             exit(fail);
         }
         else

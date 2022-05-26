@@ -94,11 +94,16 @@ const char *mimetype(const char *ext)
             for(; hashval != og; ++hashval, hashval %= mod)
             {
                 curr = site_one_mimetype_table.buckets[hashval];
-                cmp = strcmp(curr, ext);
-                if(cmp == 0)
-                {
-                    str = curr + strlen(curr);
+                if(curr == NULL)
                     hashval = og - 1;
+                else
+                {
+                    cmp = strcmp(curr, ext);
+                    if(cmp == 0)
+                    {
+                        str = curr + strlen(curr) + 1;
+                        hashval = og - 1;
+                    }
                 }
             }
         }
