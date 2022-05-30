@@ -56,9 +56,8 @@ int fetch_resource(char *path, int cli)
                 write(cli, msg200, sizeof(msg200) - 1);
                 const char *ct = ext == NULL ? "text/plain" : mimetype(ext + 1);
                 size_t ctlen = strlen(ct);
-                puts(ct);
                 write(cli, ct, ctlen);
-                write(cli, endlns, sizeof endlns);
+                write(cli, endlns, sizeof(endlns) - 1);
                 size_t bc = fread(cbuf, 1, sizeof(cbuf), fh);
                 write(cli, cbuf, bc);
                 while(bc == sizeof(cbuf))
@@ -72,9 +71,21 @@ int fetch_resource(char *path, int cli)
     }
     else
     {
-        if(errno == EACCES)
+        if(errno == ENOTDIR || errno == ENOENT || errno == EACCES)
         {
-            succ = -1;
+            char *slashp = strrchr(path, '/'), *last;
+            *slashp = '\0';
+            while(succ == 0 && access(path, F_OK) != 0)
+            {
+                last = slashp;
+                slashp = strrchr(path, '/');
+                *slashp = '\0';
+                *last = '/';
+                if(slashp == NULL)
+                    succ = -1;
+            }
+            if(succ == 0)
+                succ = fetch_executable(path, slashp + 1, cli);
         }
         else
             succ = -1;
@@ -124,5 +135,7 @@ int fetch_executable(const char *path, const char *param, int cli)
             }
         }
     }
+    else
+        infolog("Pipe creation failed");
     return succ;
 }
