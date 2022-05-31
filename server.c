@@ -22,7 +22,9 @@ struct accept_routine_data
     int sfd;
 };
 char msg400[] = "HTTP/1.1 400 Bad Request\r\ncontent-type: text\r\n\r\n400 Bad Request\r\n";
-char msg404[] = "HTTP/1.1 404 Not Found\r\ncontent-type: text\r\n\r\n404 Not Found\r\n";
+char msg404[] = "HTTP/1.1 404 Not Found\r\ncontent-type: text/html\r\n\r\n";
+char body404[5041];
+size_t body404len;
 int start_server(struct sockaddr_in *saddrp, int port);
 void *accept_routine(void *arg);
 void bad_request(int cli)
@@ -34,7 +36,8 @@ void bad_request(int cli)
 void not_found(int cli)
 {
     infolog("Previous request requested for a non-existant resource");
-    write(cli, msg404, sizeof(msg404));
+    write(cli, msg404, sizeof(msg404) - 1);
+    write(cli, body404, body404len);
     close(cli);
 }
 void fetch_file(int cli, const char *path)
@@ -46,30 +49,15 @@ void fetch_file(int cli, const char *path)
         strcpy(fname, "pages");
         strcpy(fname + 5, path);
         infolog(path);
-        /*size_t bc = write(cli, msg200, sizeof msg200);
-        if(bc != sizeof msg200)
-            infolog("Less than what should have been written was written in 200 response.");*/
         int succ = fetch_resource(fname, cli);
         if(succ != 0)
         {
             infolog("Fetching resource failed");
-            close(cli);
+            not_found(cli);
         }
         else
             close(cli);
     }
-    /*size_t bc = write(cli, msg200, sizeof msg200);
-    if(bc != sizeof msg200)
-        infolog("Less than what should have been written was written in 200 response.");
-    char cbuf[2048];
-    bc = 2048;
-    FILE *fh = fopen("pages/index.html", "r");
-    while(bc == sizeof(cbuf))
-    {
-        bc = fread(cbuf, 1, sizeof(cbuf), fh);
-        write(cli, cbuf, bc);
-    }
-    fclose(fh);*/
 }
 void sigpipe_handler(int x)
 {
@@ -132,6 +120,17 @@ int main(int argl, char *argv[])
     puts("loaded mimetypes");
     if(succ != 0)
         infolog("Could not load mimetypes file.");
+    FILE *f404 = fopen("nf404.html", "r");
+    if(f404 == NULL)
+    {
+        strcpy(body404, "404 Not Found");
+        body404len = 13;
+    }
+    else
+    {
+        body404len = fread(body404, 1, sizeof(body404), f404);
+        fclose(f404);
+    }
     struct sockaddr_in saddr;
     struct accept_routine_data ard;
     socklen_t slen = sizeof saddr;

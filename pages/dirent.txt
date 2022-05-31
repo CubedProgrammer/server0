@@ -1,0 +1,7 @@
+index.html file
+style.css file
+script.js file
+date.sh exe
+dirent.txt file
+favicon.ico file
+mc dir

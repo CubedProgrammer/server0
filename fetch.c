@@ -12,15 +12,52 @@
 char msg200[] = "HTTP/1.1 200 OK\r\nconnection: close\r\ncontent-type: ";
 char endlns[] = "\r\n\r\n";
 
+int validate_depth(const char *path)
+{
+    const char *slash = strchr(path, '/');
+    size_t last = 0;
+    int succ = 0;
+    int depth = 0;
+    for(size_t curr = 1; succ == 0 && slash[curr] != '\0'; ++curr)
+    {
+        if(slash[curr] == '/')
+        {
+            if(last + 1 == curr)
+            {
+                last = curr;
+                continue;
+            }
+            else if(last + 3 == curr)
+            {
+                if(slash[last + 1] == '.' && slash[last + 2] == '.')
+                    --depth;
+                else
+                    ++depth;
+            }
+            else if(last + 2 == curr)
+            {
+                if(slash[last + 1] != '.')
+                    ++depth;
+            }
+            else
+                ++depth;
+            last = curr;
+        }
+        if(depth < 0)
+            succ = -1;
+    }
+    return succ;
+}
+
 int fetch_resource(char *path, int cli)
 {
     int succ = 0;
     char cbuf[16384];
     FILE *fh;
+    struct stat fdat;
     if(access(path, F_OK) == 0)
     {
         char ff = 0;
-        struct stat fdat;
         stat(path, &fdat);
         if(S_ISDIR(fdat.st_mode))
         {
@@ -46,15 +83,18 @@ int fetch_resource(char *path, int cli)
             infolog("Fetching file");
             openf:
             infolog(path);
-            fh = fopen(path, "r");
+            if(validate_depth(path) == 0)
+                fh = fopen(path, "r");
+            else
+                fh = NULL;
             if(fh == NULL)
                 succ = -1;
             else
             {
                 const char *ext = strrchr(path, '.');
-                puts(ext);
                 write(cli, msg200, sizeof(msg200) - 1);
                 const char *ct = ext == NULL ? "text/plain" : mimetype(ext + 1);
+                ct = ct == NULL ? "text/plain" : ct;
                 size_t ctlen = strlen(ct);
                 write(cli, ct, ctlen);
                 write(cli, endlns, sizeof(endlns) - 1);
@@ -85,7 +125,15 @@ int fetch_resource(char *path, int cli)
                     succ = -1;
             }
             if(succ == 0)
-                succ = fetch_executable(path, slashp + 1, cli);
+            {
+                stat(path, &fdat);
+                if(S_ISDIR(fdat.st_mode))
+                    succ = -1;
+                else if(access(path, X_OK) == 0)
+                    succ = fetch_executable(path, slashp + 1, cli);
+                else
+                    succ = -1;
+            }
         }
         else
             succ = -1;
@@ -96,7 +144,10 @@ int fetch_executable(const char *path, const char *param, int cli)
 {
     int succ = 0;
     int po[2];
-    succ = pipe(po);
+    if(validate_depth(path) == 0)
+        succ = pipe(po);
+    else
+        succ = -1;
     if(succ == 0)
     {
         int pid = fork();
