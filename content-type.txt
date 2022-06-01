@@ -1,0 +1,6 @@
+html text/html
+css text/css
+js text/javascript
+ico image/vdn.microsoft.icon
+jpg image/jpeg
+png image/png
