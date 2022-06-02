@@ -5,5 +5,7 @@ script.js file
 date.sh exe
 dirent.txt file
 favicon.ico file
-mc dir
+mc/ dir
 redirect.c exe
+zodiac-year.html file
+zodiac-year.js file

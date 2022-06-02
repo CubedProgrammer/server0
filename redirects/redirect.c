@@ -5,12 +5,18 @@ int main(int argl, char *argv[])
 {
     int succ = 0;
     if(argv[1] == NULL)
-        succ = -1;
+    {
+        empty:
+        puts("HTTP/1.1 308 Permanent Redirect\r");
+        puts("Location: 307.html\r\n\r");
+    }
     else
     {
         char *arg = argv[1];
         char numstr[25], url[2601];
-        if(arg[0] == '?')
+        if(arg[0] == '\0')
+            goto empty;
+        else if(arg[0] == '?')
         {
             ++arg;
             char *eqp = strchr(arg, '=');
