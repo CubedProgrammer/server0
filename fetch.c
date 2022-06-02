@@ -70,13 +70,19 @@ int fetch_resource(char *path, int cli)
             {
                 strcpy(indexp + plen, "/index.html");
                 path = indexp;
-                infolog("Attempted to fetch directory, fetching this index.html file");
-                ff = 1;
+                if(access(path, F_OK) == 0)
+                    infolog("Attempted to fetch directory, fetching this index.html file");
+                else
+                {
+                    // to be implemented
+                    infolog("The file index.html does not exists, fetching default index.html instead");
+                    succ = -1;
+                }
             }
         }
-        else if(access(path, X_OK) == 0)
+        if(access(path, X_OK) == 0)
             succ = fetch_executable(path, "", cli);
-        else
+        else if(succ == 0)
             ff = 1;
         if(ff)
         {
@@ -123,6 +129,11 @@ int fetch_resource(char *path, int cli)
                 *last = '/';
                 if(slashp == NULL)
                     succ = -1;
+                else
+                {
+                    *slashp = '\0';
+                    *last = '/';
+                }
             }
             if(succ == 0)
             {
