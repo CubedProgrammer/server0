@@ -125,8 +125,6 @@ int fetch_resource(char *path, int cli)
             {
                 last = slashp;
                 slashp = strrchr(path, '/');
-                *slashp = '\0';
-                *last = '/';
                 if(slashp == NULL)
                     succ = -1;
                 else
