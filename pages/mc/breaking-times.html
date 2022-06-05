@@ -6,6 +6,20 @@
     </head>
     <body>
         <h1>Breaking Times</h1>
+        <select id="block"></select>
+        <select id="tier">
+            <option>hand</option>
+            <option>wood</option>
+            <option>stone</option>
+            <option>iron</option>
+            <option>diamond</option>
+            <option>netherite</option>
+            <option>gold</option>
+        </select>
+        <label for="haste">Haste</label>
+        <input min="0"max="255"value="0"id="haste"name="haste"type="number">
+        <label for="mf">Mining Fatigue</label>
+        <input min="0"max="4"value="0"id="mf"name="mf"type="number">
         <p id="result">Unbreakable</p>
         <script src="breaking-times.js"></script>
     </body>
