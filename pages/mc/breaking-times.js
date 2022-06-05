@@ -1,0 +1,1 @@
+resElem = document.getElementById()

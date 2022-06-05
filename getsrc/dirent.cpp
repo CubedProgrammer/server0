@@ -11,12 +11,15 @@ bool validate_ext(const std::string &ext)
 void dirent()
 {
     using namespace std::filesystem;
-    std::cout << "HTTP 200 OK\r\n" << "connection: close\r\n" << "content-type: text/plain\r\n\r\n";
+    std::cout << "HTTP/1.1 200 OK\r\n" << "connection: close\r\n" << "content-type: text/plain\r\n\r\n";
     path p = ".";
     recursive_directory_iterator enit(p);
     for(path en : enit)
     {
         if(en.has_extension() && validate_ext(en.extension()))
-            std::cout << en.string() << '\n';
+        {
+            if((status(en).permissions() & perms::owner_exec) != perms::owner_exec)
+                std::cout << en.string().substr(2) << '\n';
+        }
     }
 }
