@@ -3,6 +3,7 @@ hasteElem = document.getElementById('haste')
 fatigueElem = document.getElementById('mf')
 tierElem = document.getElementById('tier')
 blockElem = document.getElementById('block')
+effElem = document.getElementById('eff')
 OPBEGIN = '<option>'
 OPEND = '</option>'
 req = new XMLHttpRequest()
@@ -23,7 +24,9 @@ function calcHardness()
     }
     var y = hardness * 30, n = hardness * 100
     var haste = parseInt(hasteElem.value), fatigue = parseInt(fatigueElem.value)
-    var dmg = tierdmg[tierElem.value] * (haste / 5 + 1)
+    var efflvl = parseInt(effElem.value)
+    var dmg = tierdmg[tierElem.value] + efflvl * efflvl + (efflvl > 0)
+    dmg *= haste / 5 + 1;
     for(var i = 0; i < fatigue; i++) dmg *= 0.3
     y = Math.ceil(y / dmg) / 20
     n = Math.ceil(n / dmg) / 20
