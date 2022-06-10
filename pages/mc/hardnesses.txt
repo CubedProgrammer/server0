@@ -1,6 +1,5 @@
 acacia_door 3
 activator_rail 0.7
-air 0
 amethyst_bud 1.5
 amethyst_cluster 1.5
 ancient_debris 30
@@ -58,7 +57,7 @@ brick_wall 2
 bricks 2
 brown_mushroom 0
 budding_amethyst 1.5
-button 0.5_
+button 0.5
 cactus 0.4
 cake 0.5
 calcite 0.75
@@ -191,8 +190,6 @@ fletching_table 2.5
 flower 0
 flower_pot 0
 flowering_azalea 0
-flowing_lava 100
-flowing_water 100
 froglight 0.3
 frogspawn 0
 frosted_ice 0.5
@@ -258,7 +255,6 @@ lantern 3.5
 lapis 3
 lapis_lazuli_ore 3
 lapis_ore 3
-lava 100
 leaves 0.2
 lectern 2.5
 lever 0.5
@@ -492,7 +488,6 @@ usb_charger_block 3
 vines 0.2
 warped_door 3
 wart_block 1
-water 100	
 weathered_cut_copper 3
 web 4
 weeping_vines 0

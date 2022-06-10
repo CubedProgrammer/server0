@@ -1,8 +1,49 @@
 body
 {
-    background-color: #124412;
-    color: #ee55aa;
+    background-color: #123312;
+    color: #9988ee;
     font-size: 16px;
+}
+h1
+{
+    text-align: center;
+}
+#tier
+{
+    text-align: center;
+}
+#result
+{
+    text-align: center;
+}
+select
+{
+    border: none;
+    background-color: #331212;
+    color: #eeeeee;
+    font-size: 24px;
+}
+input
+{
+    background-color: #122212;
+    color: #ccaadd;
+    border: none;
+    font-size: 20px;
+}
+input[type=number]
+{
+    text-align:right;
+}
+button
+{
+    border: none;
+    background-color: #334412;
+    color: #eeeeee;
+    font-size: 20px;
+}
+button:hover
+{
+    background-color: #445512;
 }
 .dirent
 {
