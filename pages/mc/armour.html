@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Armour and Damage</title>
+        <link rel="stylesheet"href="style.css">
+    </head>
+    <body>
+        <h1>Armour and Damage</h1>
+        <label for="dmg">Damage</label>
+        <input value="0"id="dmg"name="dmg">
+        <label for="armour">Armour</label>
+        <input min="0"max="32767"value="0"id="armour"name="armour"type="number">
+        <label for="toughness">Toughness</label>
+        <input min="0"max="32767"value="0"id="toughness"name="toughness"type="number">
+        <button onclick="calcDmg()">Calculate</button>
+        <button onclick="toElem.value=0;arElem.value=7">Full Leather</button>
+        <button onclick="toElem.value=0;arElem.value=11">Full Gold</button>
+        <button onclick="toElem.value=0;arElem.value=12">Full Chainmail</button>
+        <button onclick="toElem.value=0;arElem.value=15">Full Iron</button>
+        <button onclick="toElem.value=8;arElem.value=20">Full Diamond</button>
+        <button onclick="toElem.value=12;arElem.value=20">Full Netherite</button>
+        <p id="result">0</p>
+        <script src="armour.js"></script>
+    </body>
+</html>

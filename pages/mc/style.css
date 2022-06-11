@@ -16,6 +16,10 @@ h1
 {
     text-align: center;
 }
+#dmg
+{
+    text-align: right;
+}
 select
 {
     border: none;
