@@ -2,6 +2,7 @@ index.html file
 style.css file
 script.js file
 307.html file
+crandom virt
 date.sh virt
 dirent.txt file
 favicon.ico file
