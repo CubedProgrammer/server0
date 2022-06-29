@@ -7,6 +7,8 @@ date.sh virt
 dirent.txt file
 favicon.ico file
 getsrc.cpp virt
+linux-size.txt file
+linux-sloc.txt file
 mc/ dir
 redirect.c virt
 zodiac-year.html file
