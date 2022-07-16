@@ -5,10 +5,12 @@ script.js file
 crandom virt
 date.sh virt
 dirent.txt file
+factor.html file
+factor.js file
 favicon.ico file
 getsrc.cpp virt
-linux-size.txt file
-linux-sloc.txt file
+linux_size.txt file
+linux_sloc.txt file
 mc/ dir
 redirect.c virt
 zodiac-year.html file

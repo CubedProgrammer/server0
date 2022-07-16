@@ -4,7 +4,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<sys/select.h>
 #include<sys/socket.h>
+#include<time.h>
 #include<unistd.h>
 #include"fetch.h"
 #include"logging.h"
@@ -66,44 +68,60 @@ void sigpipe_handler(int x)
 int handle_client(int cli)
 {
     char cbuf[10001];
-    size_t bc = read(cli, cbuf, 10000);
-    cbuf[bc] = '\0';
-    infolog("Request was made.");
-    infolog(cbuf);
-    char reqmeth[13];
-    char *space = strchr(cbuf, ' ');
-    unsigned ind = space == NULL ? 13 : space - cbuf;
+    size_t bc = 0;
+    fd_set fds, *fdsp = &fds;
+    struct timeval tv, *tvp = &tv;
     int succ = 0;
-    if(ind > 12)
+    FD_ZERO(fdsp);
+    FD_SET(cli, fdsp);
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    int ready = select(cli + 1, fdsp, NULL, NULL, tvp);
+    if(ready)
     {
-        bad_request(cli);
-        succ = -1;
+        bc = read(cli, cbuf, 10000);
+		cbuf[bc] = '\0';
+		infolog("Request was made.");
+		infolog(cbuf);
+		char reqmeth[13];
+		char *space = strchr(cbuf, ' ');
+		unsigned ind = space == NULL ? 13 : space - cbuf;
+		if(ind > 12)
+		{
+		    bad_request(cli);
+		    succ = -1;
+		}
+		else
+		{
+		    strncpy(reqmeth, cbuf, ind);
+		    reqmeth[ind] = '\0';
+		    if(strcmp(reqmeth, "GET") == 0)
+		    {
+		        char *path = space + 1;
+		        space = strchr(path, ' ');
+		        if(space == NULL)
+		        {
+		            bad_request(cli);
+		            succ = -1;
+		        }
+		        else
+		        {
+		            ind = space - path;
+		            path[ind] = '\0';
+		            fetch_file(cli, path);
+		        }
+		    }
+		    else
+		    {
+		        bad_request(cli);
+		        succ = -1;
+		    }
+		}
     }
     else
     {
-        strncpy(reqmeth, cbuf, ind);
-        reqmeth[ind] = '\0';
-        if(strcmp(reqmeth, "GET") == 0)
-        {
-            char *path = space + 1;
-            space = strchr(path, ' ');
-            if(space == NULL)
-            {
-                bad_request(cli);
-                succ = -1;
-            }
-            else
-            {
-                ind = space - path;
-                path[ind] = '\0';
-                fetch_file(cli, path);
-            }
-        }
-        else
-        {
-            bad_request(cli);
-            succ = -1;
-        }
+        infolog("A client connected but did not make a request in time.");
+        succ = -1;
     }
     return succ;
 }
