@@ -12,6 +12,7 @@ getsrc.cpp virt
 linux_size.txt file
 linux_sloc.txt file
 mc/ dir
+portal.html file
 redirect.c virt
 zodiac-year.html file
 zodiac-year.js file

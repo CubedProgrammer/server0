@@ -17,7 +17,7 @@ function expToLvl(exp)
     else if(exp < 1628)
         exp = Math.min(31, Math.floor(Math.sqrt(40 * exp - 7839) / 10 + 8.1))
     else
-        exp = (Math.sqrt(72 * exp - 54359) + 325) / 18
+        exp = Math.floor((Math.sqrt(72 * exp - 54359) + 325) / 18)
     return exp
 }
 function calcLvl()
