@@ -3,6 +3,10 @@ body
     background-color: #220055;
     color: #12ee12;
 }
+a
+{
+    color: #23aa12;
+}
 #ls
 {
     list-style-type: none;

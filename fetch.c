@@ -120,7 +120,10 @@ int fetch_resource(char *path, int cli)
         if(errno == ENOTDIR || errno == ENOENT || errno == EACCES)
         {
             char *slashp = strrchr(path, '/'), *last;
-            *slashp = '\0';
+            if(slashp != NULL)
+                *slashp = '\0';
+            else
+                succ = -1;
             while(succ == 0 && access(path, F_OK) != 0)
             {
                 last = slashp;
