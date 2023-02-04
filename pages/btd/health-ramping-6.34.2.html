@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Health Ramping</title>
+        <link rel="stylesheet"href="health-ramping.css">
+    </head>
+    <body>
+        <h1>Health Ramping</h1>
+        <label for="round">Round</label>
+        <input min="0"max="2147483647"value="0"id="round"name="round"type="number">
+        <button onclick="displayRamp()">Calculate</button>
+        <p id="result"></p>
+        <br>
+        <table id="chart">
+            <tr>
+                <th>Round</th>
+                <th>Scalar</th>
+                <th>MOAB</th>
+                <th>BFB</th>
+                <th>ZOMG</th>
+                <th>DDT</th>
+                <th>BAD</th>
+            </tr>
+        </table>
+        <script src="health-ramping.js"></script>
+    </body>
+</html>

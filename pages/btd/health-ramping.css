@@ -1,0 +1,25 @@
+body
+{
+    background-color: #121e33;
+    color: #33ccee;
+    text-align: center;
+}
+#round
+{
+    font-size: 20px;
+    color: #44ddee;
+    text-align: center;
+}
+table, th, td
+{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border: 1px solid #aa3322;
+}
+.p
+{
+    font-size: 20px;
+    color: #33ccee;
+    text-align: center;
+}
