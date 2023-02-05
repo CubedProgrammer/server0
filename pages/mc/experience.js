@@ -1,5 +1,48 @@
 lvlElem = document.getElementById('level')
 expElem = document.getElementById('experience')
+tableElem = document.getElementById('chart')
+lvlStart = 1
+tableTxtNodes = []
+document.addEventListener('keypress', keyScrollTable)
+for(var i = 1; i <= 24; ++i)
+{
+    var trnode = document.createElement('tr')
+    var lvltd = document.createElement('td')
+    var exptd = document.createElement('td')
+    var lvltxt = i.toString(10)
+    var exptxt = lvlToExp(i).toString(10)
+    var lvltn = document.createTextNode(lvltxt)
+    var exptn = document.createTextNode(exptxt)
+    lvltd.appendChild(lvltn)
+    exptd.appendChild(exptn)
+    trnode.appendChild(lvltd)
+    trnode.appendChild(exptd)
+    tableElem.appendChild(trnode)
+    tableTxtNodes.push([lvltd, exptd])
+}
+function updateTable()
+{
+    var start = lvlStart
+    for(var r of tableTxtNodes)
+    {
+        r[0].innerText = start.toString(10)
+        r[1].innerText = lvlToExp(start).toString(10)
+        ++start
+    }
+}
+function keyScrollTable(e)
+{
+    k = e.keyCode
+    if(k === 115)
+        ++lvlStart
+    else if(k === 119 && lvlstart > 0)
+        --lvlstart
+    else if(k === 97)
+        lvlStart = Math.max(0, lvlStart - 24)
+    else if(k === 100)
+        lvlStart += 24
+    updateTable()
+}
 function lvlToExp(lvl)
 {
     if(lvl < 17)
