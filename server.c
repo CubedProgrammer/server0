@@ -1,4 +1,5 @@
 #include<arpa/inet.h>
+#include<errno.h>
 #include<pthread.h>
 #include<signal.h>
 #include<stdio.h>
@@ -59,6 +60,11 @@ void fetch_file(int cli, const char *path)
         }
         else
             close(cli);
+    }
+    else
+    {
+        infolog("Path name is too long.");
+        close(cli);
     }
 }
 void sigpipe_handler(int x)
@@ -121,6 +127,7 @@ int handle_client(int cli)
     else
     {
         infolog("A client connected but did not make a request in time.");
+        close(cli);
         succ = -1;
     }
     return succ;
@@ -182,7 +189,8 @@ void *accept_routine(void *arg)
         cfd = accept(sfd, sap, slen);
         if(cfd == -1)
         {
-            infolog("Accepting a client has failed");
+            snprintf(msg, sizeof(msg), "Accepting a client has failed, %s.", strerror(errno));
+            infolog(msg);
         }
         else
         {
