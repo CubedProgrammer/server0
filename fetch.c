@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<sys/sendfile.h>
 #include<sys/stat.h>
 #include<sys/wait.h>
 #include<unistd.h>
@@ -52,7 +53,7 @@ int validate_depth(const char *path)
 int fetch_resource(char *path, int cli)
 {
     int succ = 0;
-    char cbuf[16384];
+    char cbuf[4096];
     FILE *fh;
     struct stat fdat;
     if(access(path, F_OK) == 0)
@@ -102,15 +103,11 @@ int fetch_resource(char *path, int cli)
                 const char *ct = ext == NULL ? "text/plain" : mimetype(ext + 1);
                 ct = ct == NULL ? "text/plain" : ct;
                 size_t ctlen = strlen(ct);
+                stat(path, &fdat);
                 write(cli, ct, ctlen);
                 write(cli, endlns, sizeof(endlns) - 1);
-                size_t bc = fread(cbuf, 1, sizeof(cbuf), fh);
-                write(cli, cbuf, bc);
-                while(bc == sizeof(cbuf))
-                {
-                    bc = fread(cbuf, 1, sizeof(cbuf), fh);
-                    write(cli, cbuf, bc);
-                }
+                if(sendfile(cli, fileno(fh), NULL, fdat.st_size) == -1)
+                    infolog("sendfile system call failed");
                 fclose(fh);
             }
         }
