@@ -13,7 +13,7 @@
 #include"logging.h"
 #include"mimetype.h"
 #ifndef PORT
-#define PORT 8080
+#define PORT 80
 #endif
 #ifndef MIMETYPES
 #define MIMETYPES "content-type.txt"

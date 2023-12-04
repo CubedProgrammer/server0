@@ -1,6 +1,7 @@
 #include<dirent.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<sys/stat.h>
 #include<sys/statvfs.h>
 #include<time.h>
@@ -27,6 +28,7 @@ int main(int argl, char *argv[])
         fssz = fsdat.f_frsize * fsdat.f_blocks;
     char selfexe[2601];
     char *ptr = realpath("/proc/self/exe", selfexe);
+    char *postnum;
     size_t selfsz = 0x5f3759df, selftm;
     if(ptr != NULL)
     {
@@ -52,6 +54,7 @@ int main(int argl, char *argv[])
             bufsz = num % 1729 + 1;
         if(bufsz > 1729)
             bufsz = 1729;
+        postnum = strchr(argv[1], '/');
     }
     char cbuf[1729];
     for(size_t i = 0; i < bufsz; ++i)
@@ -62,6 +65,8 @@ int main(int argl, char *argv[])
     }
     puts("HTTP/1.1 200 OK\r");
     puts("content-type: text\r");
+    if(postnum != NULL)
+        puts("Content-Disposition: attachment\r");
     puts("connection: close\r\n\r");
     fwrite(cbuf, 1, bufsz, stdout);
     putchar('\n');
