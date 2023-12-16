@@ -67,10 +67,6 @@ void fetch_file(int cli, const char *path)
         close(cli);
     }
 }
-void sigpipe_handler(int x)
-{
-    infolog("SIGPIPE was sent.");
-}
 int handle_client(int cli)
 {
     char cbuf[10001];
@@ -134,8 +130,8 @@ int handle_client(int cli)
 }
 int main(int argl, char *argv[])
 {
-    puts("site_one");
-    signal(SIGPIPE, sigpipe_handler);
+    puts("00");
+    signal(SIGPIPE, SIG_IGN);
     const char *logfile = "logs.txt";
     if(argv[1])
         logfile = argv[1];
@@ -168,7 +164,9 @@ int main(int argl, char *argv[])
     {
         pthread_t pth;
         pthread_create(&pth, NULL, accept_routine, &ard);
+        pthread_detach(pth);
         getchar();
+        infolog("Server has been shutdown.");
         free_mimetypes();
         succ = finish_logging();
     }
