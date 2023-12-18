@@ -1,4 +1,5 @@
 #include<arpa/inet.h>
+#include<ctype.h>
 #include<errno.h>
 #include<pthread.h>
 #include<signal.h>
@@ -43,14 +44,14 @@ void not_found(int cli)
     write(cli, body404, body404len);
     close(cli);
 }
-void fetch_file(int cli, const char *path)
+void fetch_file(int cli, const char *path, const char *host)
 {
-    size_t pathlen = strlen(path);
-    if(pathlen > 0 && pathlen < 2595)
+    size_t pathlen = strlen(path), hostlen = strlen(host);
+    if(pathlen + hostlen > 0 && pathlen + hostlen < 2600)
     {
         char fname[2601];
-        strcpy(fname, "pages");
-        strcpy(fname + 5, path);
+        memcpy(fname, host, hostlen);
+        memcpy(fname + hostlen, path, pathlen + 1);
         infolog(path);
         int succ = fetch_resource(fname, cli);
         if(succ != 0)
@@ -87,6 +88,8 @@ int handle_client(int cli)
 		infolog(cbuf);
 		char reqmeth[13];
 		char *space = strchr(cbuf, ' ');
+        char *lnstart = strchr(cbuf, '\n');
+        char *colon, *hostname = NULL;
 		unsigned ind = space == NULL ? 13 : space - cbuf;
 		if(ind > 12)
 		{
@@ -108,9 +111,39 @@ int handle_client(int cli)
 		        }
 		        else
 		        {
-		            ind = space - path;
-		            path[ind] = '\0';
-		            fetch_file(cli, path);
+                    while(lnstart != NULL)
+                    {
+                        ++lnstart;
+                        colon = strchr(lnstart, ':');
+                        if(colon != NULL)
+                        {
+                            for(; colon[-1] == ' '; --colon);
+                            for(char *it = lnstart; it != colon; ++it)
+                                *it = toupper(*it);
+                            *colon = '\0';
+                            hostname = lnstart;
+                            lnstart = strchr(colon + 1, '\n');
+                            if(strcmp(hostname, "HOST") == 0)
+                            {
+                                for(hostname = colon + 1; *hostname == ' '; ++hostname);
+                                lnstart[-1] = '\0';
+                                lnstart = NULL;
+                            }
+                        }
+                        else
+                            lnstart = NULL;
+                    }
+                    if(hostname != NULL)
+                    {
+    		            ind = space - path;
+	    	            path[ind] = '\0';
+		                fetch_file(cli, path, hostname);
+                    }
+                    else
+                    {
+                        close(cli);
+                        succ = -1;
+                    }
 		        }
 		    }
 		    else
