@@ -2,7 +2,13 @@ currDate = new Date()
 isChristmas = currDate.getMonth() == 11 && currDate.getDate() >= 24 && currDate.getDate() <= 26
 req = new XMLHttpRequest()
 if(isChristmas)
+{
+    var mc = document.createElement('h1')
+    mc.innerText = 'MERRY CHRISTMAS'
+    mc.style.color = 'red'
+    document.body.insertBefore(mc, document.body.children[0])
     document.body.style.backgroundColor = 'green'
+}
 elemForFile = function(lnktxt, ftype)
 {
     var lnk = document.createElement('a')
