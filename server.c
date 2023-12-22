@@ -201,9 +201,9 @@ int main(int argl, char *argv[])
         getchar();
         infolog("Server has been shutdown.");
         free_mimetypes();
+        close(ard.sfd);
         succ = finish_logging();
     }
-    close(ard.sfd);
     return succ;
 }
 void *accept_routine(void *arg)
@@ -253,12 +253,15 @@ int start_server(struct sockaddr_in *saddrp, int port)
             else
             {
                 infolog("listen failed");
+                close(sfd);
                 sfd = -1;
             }
         }
         else
         {
             infolog("bind failed");
+            perror("bind");
+            close(sfd);
             sfd = -1;
         }
     }

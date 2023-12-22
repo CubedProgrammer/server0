@@ -1,4 +1,19 @@
+currDate = new Date()
+isChristmas = currDate.getMonth() == 11 && currDate.getDate() >= 24 && currDate.getDate() <= 26
 req = new XMLHttpRequest()
+if(isChristmas)
+    document.body.style.backgroundColor = 'green'
+elemForFile = function(lnktxt, ftype)
+{
+    var lnk = document.createElement('a')
+    lnk.innerText = lnk.href = lnktxt
+    var li = document.createElement('div')
+    var txtnode = document.createTextNode(' ' + ftype)
+    li.append(lnk)
+    li.append(txtnode)
+    li.className = isChristmas ? 'christmasdirent' : 'dirent'
+    return li
+}
 req.onreadystatechange = function()
 {
     if(this.readyState == 4 && this.status == 200)
@@ -11,13 +26,7 @@ req.onreadystatechange = function()
         {
             var enls = en.split(' ')
             var to = enls[0], ftype = enls[1]
-            var lnk = document.createElement('a')
-            lnk.innerText = lnk.href = to
-            lnk.className = 'dirent'
-            var li = document.createElement('li')
-            li.append(lnk)
-            li.append(' ' + ftype)
-            li.className = 'dirent'
+            var li = elemForFile(to, ftype)
             lsdir.append(li)
         }
     }

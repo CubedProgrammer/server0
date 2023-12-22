@@ -5,11 +5,26 @@ body
 }
 a
 {
-    color: #23aa12;
+    color: inherit;
 }
 #ls
 {
     list-style-type: none;
+}
+.christmasdirent
+{
+    font-size: 24px;
+    background-color: #ff0000;
+    color: #008000;
+    border: 8px solid #004000;
+    width: 240px;
+    text-align: center;
+    font-weight: bold;
+}
+.christmasdirent:hover
+{
+    background-color: #004000;
+    color: #ff0000;
 }
 .dirent
 {
