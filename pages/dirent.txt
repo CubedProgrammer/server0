@@ -6,6 +6,7 @@ btd/ dir
 crandom virt
 date.sh virt
 dirent.txt file
+dl/ virt
 factor.html file
 factor.js file
 favicon.ico file
