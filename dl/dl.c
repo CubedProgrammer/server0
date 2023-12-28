@@ -6,7 +6,7 @@
 #include<unistd.h>
 int main(int argl, char *argv[])
 {
-    const char *fmt = "<div><a href=\"%s\">%s</a></div>";
+    const char *fmt = "<div><a href=\"dl/%s\">%s</a></div>\n";
     int succ = 0;
     if(argv[1] == NULL || argv[1][0] == '\0')
     {
@@ -25,6 +25,8 @@ int main(int argl, char *argv[])
             puts("HTTP/1.1 200 OK\r");
             puts("Content-type: text/html\r");
             puts("Connection: close\r\n\r");
+            puts("<head><link rel=\"stylesheet\"href=\"/style.css\"></head>");
+            puts("<body>");
             for(struct dirent *en = readdir(dh); en != NULL; en = readdir(dh))
             {
                 if(en->d_type == DT_REG)
@@ -34,6 +36,7 @@ int main(int argl, char *argv[])
                 }
             }
             closedir(dh);
+            puts("</body>");
         }
     }
     else
