@@ -12,7 +12,7 @@ dl/ virt
 factor.html file
 factor.js file
 favicon.ico file
-getsrc.cpp virt
+getsrc.cpp/ virt
 linux_size.txt file
 linux_sloc.txt file
 mc/ dir
