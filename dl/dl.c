@@ -53,13 +53,17 @@ int main(int argl, char *argv[])
         else
         {
             struct stat fdat;
+            size_t totsent = 0;
+            ssize_t sent = 1;
             stat(argv[1], &fdat);
             puts("HTTP/1.1 200 OK\r");
             puts("Connection: close\r");
+            printf("Content-length: %zu\r\n", fdat.st_size);
             puts("Content-disposition: attachment\r\n\r");
             fflush(stdout);
-            sendfile(STDOUT_FILENO, fd, NULL, fdat.st_size);
+            for(; sent > 0 && totsent < fdat.st_size; totsent += sent = sendfile(STDOUT_FILENO, fd, NULL, fdat.st_size - totsent));
             close(fd);
+            succ = sent < 0;
         }
     }
     return succ;
