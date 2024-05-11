@@ -47,7 +47,15 @@ void not_found(int cli)
 void fetch_file(int cli, const char *path, const char *host)
 {
     size_t pathlen = strlen(path), hostlen = strlen(host);
-    if(pathlen + hostlen > 0 && pathlen + hostlen < 2600)
+    if(strchr(host, '/') != NULL)
+    {
+        char msg[] = "Don't try it!";
+        infolog("Host name contains a / other than the end.");
+        write(cli, msg404, sizeof(msg404) - 1);
+        write(cli, msg, sizeof(msg) - 1);
+        close(cli);
+    }
+    else if(pathlen + hostlen > 0 && pathlen + hostlen < 2600)
     {
         char fname[2601];
         memcpy(fname, host, hostlen);

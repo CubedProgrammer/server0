@@ -179,20 +179,17 @@ int fetch_executable(const char *path, const char *param, int cli)
             close(po[1]);
             int rd = po[0];
             int status;
+            char cbuf[16384];
+            ssize_t bc = read(rd, cbuf, sizeof cbuf);
+            while(bc > 0)
+            {
+                write(cli, cbuf, bc);
+                bc = read(rd, cbuf, sizeof cbuf);
+            }
             waitpid(pid, &status, 0);
             status = WEXITSTATUS(status);
             if(status != 0)
                 succ = -1;
-            else
-            {
-                char cbuf[16384];
-                size_t bc = sizeof cbuf;
-                while(bc == sizeof(cbuf))
-                {
-                    bc = read(rd, cbuf, sizeof cbuf);
-                    write(cli, cbuf, bc);
-                }
-            }
         }
     }
     else
