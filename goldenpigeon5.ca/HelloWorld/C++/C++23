@@ -1,0 +1,6 @@
+import std;
+int main(int argl,char**argv)
+{
+    std::println("Hello World.");
+    return 0;
+}

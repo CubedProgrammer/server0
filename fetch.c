@@ -62,14 +62,20 @@ int fetch_resource(char *path, int cli)
     {
         char ff = 0;
         stat(path, &fdat);
-        if(S_ISDIR(fdat.st_mode))
+        size_t plen = strlen(path);
+        char exe = access(path, X_OK) == 0;
+        if(exe && path[plen - 1] != '/')
+        {
+            const char *base = strrchr(path, '/');
+            infolog("Redirecting to directory ending in a / for technical purposes");
+            write(cli, cbuf, sprintf(cbuf, slashredirect, base == NULL ? path : base + 1));
+        }
+        else if(S_ISDIR(fdat.st_mode))
         {
             char *indexp = cbuf;
             strcpy(indexp, path);
-            size_t plen = strlen(indexp);
             if(plen > 2589)
                 succ = -1;
-            else if(indexp[plen - 1] == '/')
             {
                 strcpy(indexp + plen, "index.html");
                 path = indexp;
@@ -89,14 +95,8 @@ int fetch_resource(char *path, int cli)
                         infolog("Fetching the default index.html failed");
                 }
             }
-            else
-            {
-                const char *base = strrchr(path, '/');
-                infolog("Redirecting to directory ending in a / for technical purposes");
-                write(cli, cbuf, sprintf(cbuf, slashredirect, base == NULL ? path : base + 1));
-            }
         }
-        else if(access(path, X_OK) == 0)
+        else if(exe)
             succ = fetch_executable(path, "", cli);
         else
             ff = 1;

@@ -8,7 +8,7 @@ int main(int argl, char *argv[])
     {
         empty:
         puts("HTTP/1.1 308 Permanent Redirect\r");
-        puts("Location: 307.html\r\n\r");
+        puts("Location: /307.html\r\n\r");
     }
     else
     {
