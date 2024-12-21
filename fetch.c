@@ -11,8 +11,9 @@
 #include"logging.h"
 #include"mimetype.h"
 
-char msg200[] = "HTTP/1.1 200 OK\r\nconnection: close\r\ncontent-type: ";
-char endlns[] = "\r\n\r\n";
+const char msg200[] = "HTTP/1.1 200 OK\r\nconnection: close\r\ncontent-type: ";
+const char endlns[] = "\r\n\r\n";
+const char slashredirect[] = "HTTP/1.1 308 Permanent Redirect\r\nLocation: %s/\r\n\r\n";
 
 int validate_depth(const char *path)
 {
@@ -68,9 +69,9 @@ int fetch_resource(char *path, int cli)
             size_t plen = strlen(indexp);
             if(plen > 2589)
                 succ = -1;
-            else
+            else if(indexp[plen - 1] == '/')
             {
-                strcpy(indexp + plen, "/index.html");
+                strcpy(indexp + plen, "index.html");
                 path = indexp;
                 if(access(path, F_OK) == 0)
                 {
@@ -87,6 +88,12 @@ int fetch_resource(char *path, int cli)
                     if(default_index_html(cli, path))
                         infolog("Fetching the default index.html failed");
                 }
+            }
+            else
+            {
+                const char *base = strrchr(path, '/');
+                infolog("Redirecting to directory ending in a / for technical purposes");
+                write(cli, cbuf, sprintf(cbuf, slashredirect, base == NULL ? path : base + 1));
             }
         }
         else if(access(path, X_OK) == 0)
