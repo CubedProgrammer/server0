@@ -7,6 +7,7 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include"fetch.h"
+#include"index.h"
 #include"logging.h"
 #include"mimetype.h"
 
@@ -72,18 +73,25 @@ int fetch_resource(char *path, int cli)
                 strcpy(indexp + plen, "/index.html");
                 path = indexp;
                 if(access(path, F_OK) == 0)
+                {
                     infolog("Attempted to fetch directory, fetching this index.html file");
+                    ff = 1;
+                }
                 else
                 {
-                    // to be implemented
                     infolog("The file index.html does not exists, fetching default index.html instead");
-                    succ = -1;
+                    path[plen] = '\0';
+                    write(cli, msg200, sizeof(msg200) - 1);
+                    write(cli, "text/html", 9);
+                    write(cli, endlns, sizeof(endlns) - 1);
+                    if(default_index_html(cli, path))
+                        infolog("Fetching the default index.html failed");
                 }
             }
         }
-        if(access(path, X_OK) == 0)
+        else if(access(path, X_OK) == 0)
             succ = fetch_executable(path, "", cli);
-        else if(succ == 0)
+        else
             ff = 1;
         if(ff)
         {
